@@ -486,9 +486,12 @@
   .sv-banner.gone { display: none; }
 
   /* Setup cards */
-  .pc-head { display: flex; gap: 12px; align-items: flex-start; }
-  .pc-ico { color: var(--primary); flex: none; display: grid; place-items: center; }
-  .pc-ico svg { width: 26px; height: 26px; }
+  .pc-head { display: flex; gap: 12px; align-items: center; }
+  .pc-ico {
+    width: 42px; height: 42px; border-radius: 12px; flex: none;
+    background: var(--primary-soft); color: var(--primary); display: grid; place-items: center;
+  }
+  .pc-ico svg { width: 22px; height: 22px; }
   .pc-title { font-size: 15px; font-weight: 500; color: #1d1d2e; line-height: 1.4; }
   .pc-sub { font-size: 13px; color: #a3a3b3; margin-top: 8px; }
   .btn-chip {

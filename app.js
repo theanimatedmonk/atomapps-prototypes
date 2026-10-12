@@ -703,6 +703,7 @@
       $('#win').classList.add('show');
       screen.classList.add('win-on');
       confetti($('#winTick'));
+      playSuccessPop();
       setTimeout(() => {
         closePanel(true);
         if (s.onSolved) s.onSolved();
@@ -718,6 +719,7 @@
     $('#svSolve').hidden = true;
     $('#svDone').hidden = false;
     confetti($('#doneTick'));
+    playSuccessPop();
   }
 
   // Glowing tick: circle pops, check draws, rings burst, glow breathes
@@ -1284,6 +1286,38 @@
     if (duration) stopT = setTimeout(stopSound, duration);
     playing = kind;
     if (kind === 'sample') { playBtn.innerHTML = STOP_ICON; playBtn.setAttribute('aria-label', 'Stop sound'); }
+  }
+  // Success sound for the tick: a soft bubble pop as the circle appears,
+  // then a quiet two-note sparkle as the check finishes drawing
+  function playSuccessPop() {
+    try {
+      ac = ac || new (window.AudioContext || window.webkitAudioContext)();
+      if (ac.state === 'suspended') ac.resume();
+    } catch (e) { return; }
+    const t = ac.currentTime + 0.02;
+    const out = ac.createGain();
+    out.gain.value = 0.35;
+    out.connect(ac.destination);
+    const pop = ac.createOscillator(), pg = ac.createGain();
+    pop.type = 'sine';
+    pop.frequency.setValueAtTime(520, t);
+    pop.frequency.exponentialRampToValueAtTime(140, t + 0.09);
+    pg.gain.setValueAtTime(0.0001, t);
+    pg.gain.exponentialRampToValueAtTime(0.9, t + 0.005);
+    pg.gain.exponentialRampToValueAtTime(0.0001, t + 0.12);
+    pop.connect(pg).connect(out);
+    pop.start(t); pop.stop(t + 0.14);
+    [[1046.5, 0.55], [1568, 0.63]].forEach(([f, d]) => {
+      const s = ac.createOscillator(), sg = ac.createGain();
+      s.type = 'triangle';
+      s.frequency.value = f;
+      sg.gain.setValueAtTime(0.0001, t + d);
+      sg.gain.exponentialRampToValueAtTime(0.16, t + d + 0.01);
+      sg.gain.exponentialRampToValueAtTime(0.0001, t + d + 0.35);
+      s.connect(sg).connect(out);
+      s.start(t + d); s.stop(t + d + 0.4);
+    });
+    setTimeout(() => out.disconnect(), 1300);
   }
   function setLiveVolume(vol) {
     if (master && playing === 'sample') master.gain.setTargetAtTime(Math.max(.0001, (vol / 100) ** 1.5), ac.currentTime, .05);
