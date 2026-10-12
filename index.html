@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Alarm Clock</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<aside class="sb" aria-label="Prototype navigation">
+  <div class="sb-head">
+    <div class="sb-logo"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4h3M5 3 2 6M22 6l-3-3"/></svg></div>
+    <div>
+      <div class="sb-title">Wake-up challenges</div>
+      <div class="sb-sub">Alarm app prototype · Android</div>
+    </div>
+  </div>
+  <div class="sb-label">Challenges</div>
+  <nav class="sb-nav" id="sbNav"></nav>
+  <section class="sb-panel" id="sbPanel" aria-live="polite"></section>
+  <div class="sb-foot">
+    <span>Click the phone to use it. Everything is saved in your browser.</span>
+    <button id="sbReset">Reset prototype</button>
+  </div>
+</aside>
+<main class="stagewrap" id="stagewrap">
+<div class="stage" id="stage">
+  <div class="phone" id="phone">
+    <div class="screen" id="screen">
+
+      <div class="statusbar">
+        <span id="sbTime">9:41</span>
+        <span class="camera"></span>
+        <span class="icons">
+          <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor"><path d="M8 11.5 0 3.2A11.5 11.5 0 0 1 16 3.2Z"/></svg>
+          <svg width="14" height="12" viewBox="0 0 14 12" fill="currentColor"><path d="M14 0v12H0Z"/></svg>
+          <svg width="22" height="12" viewBox="0 0 22 12" fill="none"><rect x=".5" y=".5" width="19" height="11" rx="3" stroke="currentColor" opacity=".5"/><rect x="2" y="2" width="14" height="8" rx="1.5" fill="currentColor"/><rect x="20.5" y="4" width="1.5" height="4" rx=".75" fill="currentColor" opacity=".5"/></svg>
+        </span>
+      </div>
+
+      <div class="views">
+        <!-- Alarm list -->
+        <section class="view" id="listView" aria-label="Alarms">
+          <div class="scroll">
+            <header class="list-head">
+              <button class="icon-btn" id="menuBtn" aria-label="Menu">
+                <svg width="24" height="20" viewBox="0 0 24 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 3h20M2 10h12M2 17h20"/></svg>
+              </button>
+              <div class="now" id="nowLabel"></div>
+              <span></span>
+            </header>
+            <div class="list">
+              <div class="hero" id="hero"></div>
+              <div class="add-card">
+                <div class="title">
+                  <span class="badge"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2M5 3 2 6M22 6l-3-3"/></svg></span>
+                  Add a new custom alarm
+                </div>
+                <button class="btn-primary" id="createBtn">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 4v16M4 12h16"/></svg>
+                  Create alarm
+                </button>
+              </div>
+              <div id="alarmList" style="display:flex;flex-direction:column;gap:14px"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Create / edit alarm -->
+        <section class="view" id="editView" aria-label="New alarm">
+          <div class="scroll" id="editScroll">
+            <header class="edit-head">
+              <button class="icon-btn" id="backBtn" aria-label="Back">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+              </button>
+              <div class="titles">
+                <h1 id="editTitle">New alarm</h1>
+                <div class="rings" id="ringsIn">Rings in —</div>
+              </div>
+              <button class="icon-btn" id="deleteBtn" aria-label="Delete alarm" hidden>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>
+              </button>
+            </header>
+
+            <div class="picker">
+              <div class="wheel-wrap">
+                <div class="wheel" id="hourWheel" aria-label="Hour"></div>
+                <div class="colon">:</div>
+                <div class="wheel" id="minWheel" aria-label="Minute"></div>
+              </div>
+              <div class="ampm">
+                <button id="amBtn" aria-pressed="true">AM</button>
+                <button id="pmBtn" aria-pressed="false">PM</button>
+              </div>
+            </div>
+
+            <div class="cards">
+              <div class="card">
+                <div class="row"><span class="t">Repeat</span><span class="accent" id="repeatLabel"></span></div>
+                <div class="days" id="days"></div>
+              </div>
+
+              <div class="card">
+                <div class="row"><span class="t">Alarm volume</span><span class="muted" id="volPct">70%</span></div>
+                <div class="vol">
+                  <svg class="spk" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 9h4l5-4v14l-5-4H4z"/></svg>
+                  <input type="range" id="volume" min="0" max="100" value="70" aria-label="Alarm volume">
+                  <button class="play" id="playBtn" aria-label="Play sound"></button>
+                </div>
+                <div class="divider"></div>
+                <div class="row">
+                  <div><div class="t">Increase volume gradually</div><div class="s">Starts soft, reaches full in 30 sec</div></div>
+                  <button class="switch" role="switch" id="gradualSw" aria-label="Increase volume gradually"></button>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="row">
+                  <div><div class="t">Snooze</div><div class="s" id="snoozeSub">5 minutes</div></div>
+                  <button class="switch" role="switch" id="snoozeSw" aria-label="Snooze"></button>
+                </div>
+              </div>
+
+              <div class="card ch-card" id="challengeCard">
+                <button class="challenge-tile" id="challengeTile">
+                  <span class="ch-icon" id="challengeTileIcon"></span>
+                  <span class="ch-text">
+                    <span class="t" id="challengeTileTitle">Wake-up challenge</span>
+                    <span class="s" id="challengeTileSub">Off · Dismiss stops the alarm</span>
+                  </span>
+                  <svg class="chev-r" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+                </button>
+                <button class="ch-remove-btn" id="challengeRemove" hidden>Remove Challenge</button>
+              </div>
+
+              <div class="card more" id="more">
+                <button class="row more-head" id="moreHead" aria-expanded="false">
+                  <div><div class="t">More options</div><div class="s" id="moreSummary"></div></div>
+                  <svg class="chev" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+                </button>
+                <div class="more-body"><div>
+                  <div class="more-inner">
+                    <div>
+                      <div class="field-label">Label</div>
+                      <input class="text-input" id="labelInput" maxlength="24" placeholder="e.g. Gym, Take meds">
+                    </div>
+                    <div>
+                      <div class="field-label">Sound</div>
+                      <div class="chips" id="soundChips"></div>
+                    </div>
+                    <div class="row">
+                      <span class="t" style="font-size:15px">Vibrate</span>
+                      <button class="switch" role="switch" id="vibrateSw" aria-label="Vibrate"></button>
+                    </div>
+                    <div>
+                      <div class="field-label">Snooze length</div>
+                      <div class="chips" id="snoozeChips"></div>
+                    </div>
+                  </div>
+                </div></div>
+              </div>
+
+              <div class="card preview">
+                <div class="thumb"><div class="c" id="thumbTime">7:30</div><div class="bars"><i></i><i></i></div></div>
+                <div>
+                  <div class="t">Preview</div>
+                  <div class="s">See and hear how this alarm rings</div>
+                  <button class="btn-soft" id="previewBtn">
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor"><path d="M2 1l9 5-9 5z"/></svg>
+                    Preview alarm
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="footer"><button class="btn-primary" id="saveBtn" style="border-radius:12px">Save alarm</button></div>
+        </section>
+
+        <!-- Wake-up challenge picker -->
+        <section class="view" id="challengeView" aria-label="Wake-up challenge">
+          <div class="scroll">
+            <header class="ch-head">
+              <button class="icon-btn" id="challengeBack" aria-label="Back">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+              </button>
+              <h1>Wake-up challenge</h1>
+              <span></span>
+            </header>
+            <p class="ch-lead">Solve a task to turn the alarm off</p>
+            <div class="ch-list" id="challengeList" role="radiogroup" aria-label="Challenge type"></div>
+            <p class="ch-note">Steps and Scan code ask for access first.</p>
+          </div>
+          <div class="footer ch-footer"><button class="btn-primary" id="challengeContinue">Continue</button></div>
+        </section>
+
+        <!-- Challenge setup (one screen, filled per challenge type) -->
+        <section class="view" id="setupView" aria-label="Challenge setup">
+          <div class="scroll">
+            <header class="ch-head">
+              <button class="icon-btn" id="setupBack" aria-label="Back">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+              </button>
+              <h1 id="setupTitle">Math</h1>
+              <span></span>
+            </header>
+            <div class="m-body" id="setupBody"></div>
+          </div>
+          <div class="footer ch-footer pill-stack">
+            <button class="btn-outline" id="setupTest">Test it</button>
+            <button class="btn-primary" id="setupSet">Set as wake-up challenge</button>
+          </div>
+        </section>
+      </div>
+
+      <nav class="tabbar" aria-label="Sections">
+        <button class="tab" data-tab="Clock">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5h4"/></svg>Clock
+        </button>
+        <button class="tab active" data-tab="Alarm" aria-current="page">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4h3M5 3 2 6M22 6l-3-3"/></svg>Alarm
+        </button>
+        <button class="tab" data-tab="Stopwatch">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="14" r="8"/><path d="M12 10v4M10 2h4M12 2v4"/></svg>Stopwatch
+        </button>
+        <button class="tab" data-tab="Timer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="14" r="8"/><path d="M13 10l-3 4h4l-3 4M10 2h4"/></svg>Timer
+        </button>
+      </nav>
+      <div class="gesture"><i></i></div>
+
+      <!-- Ringing / preview -->
+      <div class="ringing" id="ringing" aria-hidden="true">
+        <div class="pulse">
+          <div class="r-time" id="rTime">7:30<small>AM</small></div>
+          <div class="r-label" id="rLabel">Alarm</div>
+          <div class="r-date" id="rDate"></div>
+        </div>
+        <div class="tag" id="rTag" hidden>Preview</div>
+        <div class="actions">
+          <button class="btn-snooze" id="snoozeBtn">Snooze</button>
+          <button class="btn-dismiss" id="dismissBtn">Dismiss</button>
+          <div class="r-caption" id="rCaption" hidden></div>
+        </div>
+      </div>
+
+      <!-- Challenge solver: test mode, preview and live -->
+      <div class="solver" id="solver" aria-hidden="true">
+        <div class="sv-panel" id="svSolve">
+          <header class="ch-head">
+            <button class="icon-btn" id="svClose" aria-label="Close">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+            </button>
+            <h1 class="sv-title" id="svTitle">Problem 1 of 3</h1>
+            <span></span>
+          </header>
+          <div class="sv-banner" id="svBanner">Test mode: your alarm isn’t affected</div>
+          <div class="sv-body" id="svBody"></div>
+        </div>
+
+        <div class="sv-panel" id="svDone" hidden>
+          <header class="ch-head">
+            <button class="icon-btn" id="doneBack" aria-label="Back">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+            </button>
+            <h1 class="sv-title">Test complete</h1>
+            <span></span>
+          </header>
+          <div class="done-body">
+            <div class="done-tick" id="doneTick"></div>
+            <div class="done-title">Nice work!</div>
+            <div class="done-sub" id="doneStats">3 of 3 solved in 14 seconds</div>
+            <div class="m-card done-card">
+              <span id="doneSummary">Math · Medium · 3 problems</span>
+              <button id="doneChange">Change</button>
+            </div>
+          </div>
+          <div class="sv-footer pill-stack">
+            <button class="btn-outline" id="doneAgain">Test again</button>
+            <button class="btn-primary" id="doneSet">Set as wake-up challenge</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Shown for a moment after a real (or preview) alarm challenge is solved -->
+      <div class="win" id="win" aria-live="polite">
+        <div id="winTick"></div>
+        <div class="win-title">Challenge complete</div>
+        <div class="win-sub" id="winSub">Good morning! Your alarm is off.</div>
+      </div>
+
+      <div class="toast" id="toast" role="status"><span id="toastMsg"></span><button id="toastAction" hidden></button></div>
+
+      <!-- Android system dialogs (permissions, naming a code) -->
+      <div class="dialog" id="dialog"></div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<script src="app.js"></script>
+<script src="sidebar.js"></script>
+</body>
+</html>
