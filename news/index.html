@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>News App</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="news.css">
+</head>
+<body>
+<main class="stagewrap" id="stagewrap">
+  <div class="stage" id="stage">
+    <div class="phone" id="phone">
+      <div class="screen" id="screen">
+
+        <div class="statusbar" id="statusbar">
+          <span>12:30</span>
+          <span class="camera"></span>
+          <span class="icons">
+            <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor"><path d="M8 11.5 0 3.2A11.5 11.5 0 0 1 16 3.2Z"/></svg>
+            <svg width="14" height="12" viewBox="0 0 14 12" fill="currentColor"><path d="M14 0v12H0Z"/></svg>
+            <svg width="22" height="12" viewBox="0 0 22 12" fill="none"><rect x=".5" y=".5" width="19" height="11" rx="3" stroke="currentColor" opacity=".5"/><rect x="2" y="2" width="14" height="8" rx="1.5" fill="currentColor"/><rect x="20.5" y="4" width="1.5" height="4" rx=".75" fill="currentColor" opacity=".5"/></svg>
+          </span>
+        </div>
+
+        <!-- App screens: the design exports, with tap areas on top -->
+        <div class="app" id="app">
+          <img class="scr feed" src="News%20Feed.png" alt="Top Stories feed with a Politics story card" draggable="false">
+          <img class="scr menu" id="menuScr" src="Menu.png" alt="Menu listing news topics" draggable="false">
+          <button class="hot" id="hotMenu" style="left:6px;top:29px;width:44px;height:44px" aria-label="Open menu"></button>
+          <button class="hot" id="hotBack" style="left:6px;top:29px;width:44px;height:44px" aria-label="Back to feed" hidden></button>
+          <button class="hot" id="hotTopics" style="left:0;top:80px;width:360px;height:416px" aria-label="Choose a topic" hidden></button>
+        </div>
+
+        <!-- First-run coachmarks -->
+        <div class="coach" id="coach" aria-live="polite" hidden>
+          <div class="hole" id="hole"></div>
+          <div class="ring" id="ring"></div>
+          <div class="cm-text" id="cmText"></div>
+          <div class="tap-pos" id="tapPos">
+            <div class="tap-trail"></div>
+            <div class="tap-dot" id="tapDot"></div>
+          </div>
+          <div class="win-tick" id="winTick">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.2 12.6l3.8 3.8 7.8-8"/></svg>
+          </div>
+          <div class="cm-done" id="cmDone">
+            <div class="cm-done-title">You are all set!</div>
+            <div class="cm-done-sub">Swipe up anytime for more news or use<br>menu to explore other topics</div>
+            <button class="cm-got" id="cmGot">Got it</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</main>
+
+<button class="replay" id="replay">
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
+  Replay coachmarks
+</button>
+
+<script src="news.js"></script>
+<script src="../proto-nav.js"></script>
+</body>
+</html>
