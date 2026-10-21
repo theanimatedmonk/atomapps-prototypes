@@ -1,10 +1,10 @@
 # App prototypes
 
-Clickable Android prototypes in plain HTML, CSS and JavaScript (no build step). Use the **Prototypes** button at the bottom-left to switch between them.
+Clickable Android prototypes in plain HTML, CSS and JavaScript (no build step). Use the **Prototypes** button at the bottom-left to switch between them. The site opens on the news app.
 
 ## Clock app: wake-up challenges
 
-Open `index.html` in a browser. The sidebar jumps to starting points for each part of the flow:
+Open `clock/index.html` in a browser. The sidebar jumps to starting points for each part of the flow:
 
 - **Math, Retype, Steps, Shake, Scan code**: setup, test mode, edit alarm with the challenge set, and the ringing alarm
 - **Permissions**: toggle between the first-run state (nothing granted) and everything allowed; preview each system dialog

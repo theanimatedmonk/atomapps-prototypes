@@ -1,13 +1,13 @@
 // Floating prototype switcher (bottom-left). Load on every prototype page:
-//   <script src="proto-nav.js"></script>  (root)   or   <script src="../proto-nav.js"></script>  (subfolders)
+//   <script src="../proto-nav.js"></script>  from each prototype's folder
 (() => {
   // Links resolve from this script's own location, so they work from any folder, on GitHub Pages or file://
   const root = new URL('.', document.currentScript.src);
-  const PROTOS = [
-    { id: 'clock', name: 'Clock app', sub: 'Wake-up challenges', path: 'index.html', color: '#3b32d8',
-      icon: '<circle cx="12" cy="13" r="7.5"/><path d="M12 9.5V13h3M5 3 2 6M22 6l-3-3"/>' },
+  const PROTOS = [ // first entry is the default the site opens on
     { id: 'news', name: 'News app', sub: 'First-run coachmarks', path: 'news/index.html', color: '#e0567a',
       icon: '<rect x="4" y="4" width="16" height="16" rx="2.5"/><path d="M8 9h8M8 12.5h8M8 16h5"/>' },
+    { id: 'clock', name: 'Clock app', sub: 'Wake-up challenges', path: 'clock/index.html', color: '#3b32d8',
+      icon: '<circle cx="12" cy="13" r="7.5"/><path d="M12 9.5V13h3M5 3 2 6M22 6l-3-3"/>' },
   ];
   const here = new URL(location.href);
   here.hash = ''; here.search = '';
