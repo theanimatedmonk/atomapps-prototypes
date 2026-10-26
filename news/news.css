@@ -57,12 +57,97 @@
   .statusbar svg { display: block; }
 
   /* ---------- App screens ---------- */
+  /* Positions follow the 360×820 Figma frames, whose top 24px sit under the status bar above */
   .app { position: relative; width: 360px; height: 820px; overflow: hidden; }
-  .scr { position: absolute; inset: 0; width: 360px; height: 820px; display: block; pointer-events: none; }
+  .scr { position: absolute; inset: 0; width: 360px; height: 820px; isolation: isolate; }
   .scr.menu { transform: translateX(-100%); transition: transform .45s cubic-bezier(.65,0,.35,1); will-change: transform; }
   .menu-open .scr.menu { transform: none; }
-  .hot { position: absolute; border-radius: 22px; }
-  .hot:focus-visible { outline: 2px solid var(--neon-deep); outline-offset: 2px; }
+  .app h1, .app h2, .app p { margin: 0; }
+  .app :focus-visible { outline: 2px solid var(--neon-deep); outline-offset: 2px; }
+  .icon-btn { position: absolute; left: 4px; top: 28px; width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; }
+  .icon-btn img { display: block; }
+
+  /* Feed */
+  .feed { background: #f5f5f5; }
+  .feed-title {
+    position: absolute; left: 56px; top: 42.5px; font-size: 16px; font-weight: 500; line-height: 19px;
+    letter-spacing: -.45px; color: #101828;
+  }
+  /* Story stack: drag the top card up to reveal the next one, which waits behind it in the
+     design's peeking pose (304 wide at top 140); news.js sets each card's transform */
+  .feed-list { position: absolute; left: 0; top: 76px; width: 360px; height: 700px; overflow: hidden; touch-action: none; cursor: grab; }
+  .feed-list.dragging { cursor: grabbing; }
+  .card {
+    position: absolute; left: 16px; top: 8px; width: 328px; height: 624px; overflow: hidden;
+    background: #fff; border-radius: 18px; box-shadow: 0 2px 8px rgba(0,0,0,.15);
+    transform-origin: 50% 0; will-change: transform;
+    transition: transform .45s cubic-bezier(.2,.8,.2,1), opacity .3s;
+  }
+  .feed-list.dragging .card { transition: none; }
+  .card img { -webkit-user-drag: none; user-select: none; }
+  .card-media { position: relative; height: 226px; }
+  .card-media img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .card-media::after {
+    content: ""; position: absolute; inset: 0;
+    background: linear-gradient(to bottom, rgba(0,0,0,0), rgba(0,0,0,0) 50%, rgba(0,0,0,.3));
+  }
+  .chip {
+    position: absolute; left: 22px; top: 22px; z-index: 1; padding: 5px 15px; border-radius: 999px;
+    background: rgba(255,255,255,.95); color: #000; font-size: 12px; font-weight: 600; line-height: 16px;
+    box-shadow: 0 10px 15px rgba(0,0,0,.1), 0 4px 6px rgba(0,0,0,.1);
+  }
+  .card-body { position: relative; height: 398px; padding: 24px; letter-spacing: -.3px; }
+  .card-title {
+    font-size: 24px; font-weight: 700; line-height: 1.4; color: #000;
+    display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 4; overflow: hidden;
+  }
+  .card-excerpt {
+    margin-top: 5px; font-size: 14px; line-height: 1.5; color: #364153;
+    display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 5; overflow: hidden;   /* web Inter sets a touch wider than Figma's */
+  }
+  .card-source {
+    position: absolute; left: 24px; top: 303px; display: flex; align-items: center; gap: 6px;
+    font-size: 12px; line-height: 16px; letter-spacing: 0; color: rgba(54,65,83,.85);
+  }
+  .card-source b { font-weight: 600; }
+  .card-source .sep { width: 4px; height: 4px; border-radius: 50%; background: #99a1af; }
+  .card-more {
+    position: absolute; left: 24px; top: 352px; display: flex; align-items: center; gap: 2px;
+    font-size: 15px; font-weight: 600; line-height: 18px; letter-spacing: 0; color: #004adf; text-decoration: none;
+  }
+  .swipe-hint {
+    position: absolute; left: 0; right: 0; top: 736px; display: flex; justify-content: center; align-items: center; gap: 4px;
+    font-size: 14px; font-weight: 500; line-height: 1.5; letter-spacing: -.5px; color: #4a5565;
+  }
+  .swipe-hint img { display: block; }
+
+  /* Menu */
+  .menu { display: flex; flex-direction: column; padding-bottom: 44px; background: #fff; }
+  .menu-head { position: relative; flex: none; height: 80px; }
+  .menu-title {
+    position: absolute; left: 0; right: 0; top: 38px; text-align: center;
+    font-size: 20px; font-weight: 600; line-height: 28px; letter-spacing: -.45px; color: #101828;
+  }
+  .topics { flex: none; display: flex; flex-direction: column; }
+  .topic {
+    display: flex; align-items: center; gap: 18px; height: 52px; padding-left: 22px; text-align: left;
+    font-size: 16px; font-weight: 500; line-height: 24px; letter-spacing: -.3125px; color: #364153;
+  }
+  .ti { display: block; flex: none; color: #4a5565; }
+  .topic.active { background: #eff6ff; color: #155dfc; }
+  .topic.active .ti { color: #155dfc; }
+  .menu-fill { flex: 1; background: #f3f4f6; }
+
+  /* Android navigation bar */
+  .navbar { position: absolute; left: 0; bottom: 0; z-index: 1; width: 360px; height: 44px; pointer-events: none; transition: background .35s; }
+  .menu-open .navbar { background: #fafafa; }   /* white under rgba(0,0,0,.02) */
+  .navbar > * { position: absolute; display: block; }
+  .nb-recents { left: 70px; top: 15px; }
+  .nb-recents i { position: absolute; top: 0; width: 2px; height: 16px; border-radius: 1px; background: #3b3b3b; }
+  .nb-recents i:nth-child(2) { left: 6.5px; }
+  .nb-recents i:nth-child(3) { left: 13px; }
+  .nb-home { left: 173px; top: 15px; }
+  .nb-back { left: 280.44px; top: 14.74px; }
 
   /* ---------- Coachmarks ---------- */
   .coach { position: absolute; inset: 0; z-index: 5; cursor: pointer; opacity: 0; transition: opacity .35s; }
@@ -87,6 +172,29 @@
   }
   .cm-text.center { text-align: center; }
   .cm-text.out { opacity: 0; transform: translateY(8px); }
+
+  /* Step 1 message card: white box with a cyan neon glow */
+  .cm-card {
+    position: absolute; left: 14px; right: 14px; padding: 16px 20px 17px; border-radius: 20px;
+    background: #ffffff; color: #1b2a6b;
+    box-shadow: 0 0 0 2px rgba(120,232,255,.9), 0 0 20px 5px rgba(79,227,255,.55), 0 0 46px 12px rgba(31,184,255,.28);
+    opacity: 0; transform: translateY(12px) scale(.98); pointer-events: none;
+    transition: opacity .3s ease, transform .45s cubic-bezier(.2,.8,.2,1);
+  }
+  .cm-card.show { opacity: 1; transform: none; }
+  .cm-card::after {                        /* gentle breathing of the glow */
+    content: ""; position: absolute; inset: 0; border-radius: inherit;
+    box-shadow: 0 0 30px 8px rgba(79,227,255,.45); animation: breathe 2.4s ease-in-out infinite;
+  }
+  .cm-card.tail::before {                  /* notch pointing up at the highlighted control */
+    content: ""; position: absolute; top: -9px; left: var(--tail-x, 20px); width: 16px; height: 16px; margin-left: -8px;
+    background: #ffffff; border-radius: 3px 0 0 0; transform: rotate(45deg);
+    border: 2px solid rgba(120,232,255,.9); border-right: 0; border-bottom: 0;   /* continues the card's ring */
+    box-sizing: border-box;
+  }
+  .cm-card-title { font-size: 22px; font-weight: 700; line-height: 1.22; letter-spacing: -.3px; }
+  .cm-card-sub { font-size: 16px; color: #2b2f45; margin-top: 6px; }
+  @media (prefers-reduced-motion: reduce) { .cm-card::after { animation: none; } }
 
   /* Neon tap circle: outer element moves between targets, inner element animates */
   .tap-pos {
@@ -131,7 +239,6 @@
   }
   .cm-done.show { opacity: 1; transform: none; pointer-events: auto; transition-delay: .55s; }
   .cm-done-title { font-size: 21px; font-weight: 700; text-shadow: 0 2px 12px rgba(0,0,0,.35); }
-  .cm-done-sub { font-size: 12.5px; line-height: 1.55; margin-top: 6px; opacity: .92; }
   .cm-got {
     margin-top: 18px; width: 256px; height: 44px; border-radius: 22px; background: #fff; color: #111827;
     font-size: 14px; font-weight: 600; box-shadow: 0 6px 18px -6px rgba(0,0,0,.5); transition: transform .1s;
