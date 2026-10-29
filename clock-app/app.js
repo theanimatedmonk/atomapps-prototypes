@@ -179,7 +179,8 @@
       const { t, ap } = fmt(a.h, a.m);
       const at = a.enabled ? nextAt(a, now) : null;
       const status = a.enabled ? (at ? `in ${fmtIn(at - now)}` : 'On') : 'Off';
-      const pitch = i === 0 && a.challenge === 'none';
+      // Pitch challenges until one has been set up once, then never again
+      const pitch = i === 0 && !challengeEverUsed();
       const cls = `alarm ${a.enabled ? 'on' : ''}${pitch ? ' alarm-has-banner' : ''}`;
       if (pitch) {
         return `<article class="${cls}" data-id="${a.id}" tabindex="0">
