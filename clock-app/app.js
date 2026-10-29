@@ -120,13 +120,12 @@
       return;
     }
     const sorted = [...alarms].sort((x, y) => (x.h * 60 + x.m) - (y.h * 60 + y.m));
-    const alarmBody = (a, t, ap, status, pill = '') => `<div class="alarm-body">
+    const alarmBody = (a, t, ap, status) => `<div class="alarm-body">
         <div>
           <div class="lbl">${esc(a.label || 'Alarm')}</div>
           <div class="time">${t}<span>${ap}</span></div>
           <div class="sub">${repeatLabel(a.days)} · ${status}</div>
           ${CH[a.challenge] ? `<div class="ch-set"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1" fill="currentColor"/></svg>Challenge set</div>` : ''}
-          ${pill}
         </div>
         <button class="switch" role="switch" aria-checked="${a.enabled}" aria-label="Turn ${esc(a.label || 'alarm')} ${a.enabled ? 'off' : 'on'}"></button>
       </div>`;
@@ -176,10 +175,10 @@
     const chev = `<svg class="alarm-banner-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>`;
     const pitchHTML = (place, a) => {
       const btn = (cls, inner) => `<button type="button" class="${cls}" data-pitch="${a.id}" aria-label="Set a wake-up challenge">${inner}</button>`;
-      if (place === 'pill') return btn('pitch-pill', `${pitchIcon}Add a wake-up challenge`);
+      if (place === 'pill') return btn('pitch-pill', `${pitchIcon}<span>Add a wake-up challenge</span>${chev}`);
       if (place === 'card') return btn('pitch-card', `${pitchIcon}<span class="pitch-card-copy"><span class="t">Make waking up stick</span><span class="s">Set a challenge to dismiss the alarm</span></span>${chev}`);
-      // The hero row is narrower, so it gets a shorter line naming the alarm
-      const copy = place === 'hero' ? `Add a challenge to ${esc(a.label || 'this alarm')}` : 'Set a challenge to dismiss the alarm';
+      // The hero row is narrower, so it gets a shorter line
+      const copy = place === 'hero' ? 'Add a Wake up challenge Alarm' : 'Set a challenge to dismiss the alarm';
       const row = `<span class="alarm-banner-left">${pitchIcon}<span class="alarm-banner-copy">${copy}</span></span>${chev}`;
       if (place === 'float') return `<div class="pitch-float">${btn('alarm-banner', row)}<button type="button" class="pitch-close" data-pitch-close aria-label="Hide the challenge banner"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>`;
       return btn(`alarm-banner pitch-${place}`, row);
@@ -193,7 +192,8 @@
       const status = a.enabled ? (at ? `in ${fmtIn(at - now)}` : 'On') : 'Off';
       const pitch = a === pitchAt;
       return `<article class="alarm ${a.enabled ? 'on' : ''}${pitch && place === 'footer' ? ' alarm-has-banner' : ''}" data-id="${a.id}" tabindex="0">
-        ${alarmBody(a, t, ap, status, pitch && place === 'pill' ? pitchHTML('pill', a) : '')}
+        ${alarmBody(a, t, ap, status)}
+        ${pitch && place === 'pill' ? `<div class="pitch-pill-row">${pitchHTML('pill', a)}</div>` : ''}
         ${pitch && place === 'footer' ? pitchHTML('footer', a) : ''}
       </article>`;
     }).join('');
