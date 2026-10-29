@@ -151,14 +151,11 @@
   .btn-primary:hover { background: var(--primary-press); }
   .btn-primary:active { transform: scale(.985); }
 
+  /* The padding lives on .alarm-body, so cards with and without the banner match */
   .alarm {
-    background: var(--card); border-radius: 22px; padding: 18px 22px 20px;
-    border: 1px solid var(--line);
-    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    background: var(--card); border-radius: 22px; border: 1px solid var(--line);
+    display: flex; flex-direction: column; align-items: stretch; overflow: hidden;
     cursor: pointer; transition: transform .1s;
-  }
-  .alarm-has-banner {
-    flex-direction: column; align-items: stretch; padding: 0; overflow: hidden; gap: 0;
   }
   .alarm-body {
     display: flex; align-items: center; justify-content: space-between; gap: 12px;
