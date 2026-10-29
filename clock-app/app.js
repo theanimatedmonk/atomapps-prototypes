@@ -100,6 +100,7 @@
 
   function renderList() {
     const now = new Date();
+    document.querySelector('.pitch-float')?.remove();
     const upcoming = alarms.filter(a => a.enabled)
       .map(a => ({ a, at: nextAt(a, now) })).filter(x => x.at)
       .sort((x, y) => x.at - y.at);
@@ -119,18 +120,18 @@
       return;
     }
     const sorted = [...alarms].sort((x, y) => (x.h * 60 + x.m) - (y.h * 60 + y.m));
-    const alarmBody = (a, t, ap, status) => `<div class="alarm-body">
+    const alarmBody = (a, t, ap, status, pill = '') => `<div class="alarm-body">
         <div>
           <div class="lbl">${esc(a.label || 'Alarm')}</div>
           <div class="time">${t}<span>${ap}</span></div>
           <div class="sub">${repeatLabel(a.days)} · ${status}</div>
           ${CH[a.challenge] ? `<div class="ch-set"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1" fill="currentColor"/></svg>Challenge set</div>` : ''}
+          ${pill}
         </div>
         <button class="switch" role="switch" aria-checked="${a.enabled}" aria-label="Turn ${esc(a.label || 'alarm')} ${a.enabled ? 'off' : 'on'}"></button>
       </div>`;
-    const alarmBanner = `<button type="button" class="alarm-banner" aria-label="Set a wake-up challenge">
-        <span class="alarm-banner-left">
-          <span class="alarm-banner-icon" aria-hidden="true">
+    // The challenge pitch, in whichever placement the sidebar picked
+    const pitchIcon = `<span class="alarm-banner-icon" aria-hidden="true">
             <svg class="alarm-banner-glyph" viewBox="0 0 24 24" aria-hidden="true">
               <defs>
                 <linearGradient id="abt-rim" x1="8" y1="4" x2="16" y2="18" gradientUnits="userSpaceOnUse">
@@ -171,35 +172,41 @@
                 <path d="M18.4 17.2l.3.85.85.3-.85.3-.3.85-.3-.85-.85-.3.85-.3z" fill="#ff9fbe" opacity=".75"/>
               </g>
             </svg>
-          </span>
-          <span class="alarm-banner-copy">Set a challenge to dismiss the alarm</span>
-        </span>
-        <svg class="alarm-banner-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
-      </button>`;
+          </span>`;
+    const chev = `<svg class="alarm-banner-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>`;
+    const pitchHTML = (place, a) => {
+      const btn = (cls, inner) => `<button type="button" class="${cls}" data-pitch="${a.id}" aria-label="Set a wake-up challenge">${inner}</button>`;
+      if (place === 'pill') return btn('pitch-pill', `${pitchIcon}Add a wake-up challenge`);
+      if (place === 'card') return btn('pitch-card', `${pitchIcon}<span class="pitch-card-copy"><span class="t">Make waking up stick</span><span class="s">Set a challenge to dismiss the alarm</span></span>${chev}`);
+      // The hero row is narrower, so it gets a shorter line naming the alarm
+      const copy = place === 'hero' ? `Add a challenge to ${esc(a.label || 'this alarm')}` : 'Set a challenge to dismiss the alarm';
+      const row = `<span class="alarm-banner-left">${pitchIcon}<span class="alarm-banner-copy">${copy}</span></span>${chev}`;
+      if (place === 'float') return `<div class="pitch-float">${btn('alarm-banner', row)}<button type="button" class="pitch-close" data-pitch-close aria-label="Hide the challenge banner"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>`;
+      return btn(`alarm-banner pitch-${place}`, row);
+    };
     // Shown alone it sits on the first alarm; brought back from the sidebar, on the first without a challenge
     const pitchAt = !pitchShown() ? null : lsGet(PITCH_KEY) === 'show' ? (sorted.find(a => !CH[a.challenge]) || sorted[0]) : sorted[0];
+    const place = pitchPlace();
     list.innerHTML = sorted.map((a) => {
       const { t, ap } = fmt(a.h, a.m);
       const at = a.enabled ? nextAt(a, now) : null;
       const status = a.enabled ? (at ? `in ${fmtIn(at - now)}` : 'On') : 'Off';
       const pitch = a === pitchAt;
-      const cls = `alarm ${a.enabled ? 'on' : ''}${pitch ? ' alarm-has-banner' : ''}`;
-      if (pitch) {
-        return `<article class="${cls}" data-id="${a.id}" tabindex="0">
-          ${alarmBody(a, t, ap, status)}
-          ${alarmBanner}
-        </article>`;
-      }
-      return `<article class="${cls}" data-id="${a.id}" tabindex="0">
-        ${alarmBody(a, t, ap, status)}
+      return `<article class="alarm ${a.enabled ? 'on' : ''}${pitch && place === 'footer' ? ' alarm-has-banner' : ''}" data-id="${a.id}" tabindex="0">
+        ${alarmBody(a, t, ap, status, pitch && place === 'pill' ? pitchHTML('pill', a) : '')}
+        ${pitch && place === 'footer' ? pitchHTML('footer', a) : ''}
       </article>`;
     }).join('');
+    if (pitchAt && place === 'hero') hero.insertAdjacentHTML('beforeend', pitchHTML('hero', pitchAt));
+    if (pitchAt && place === 'card') list.insertAdjacentHTML('afterbegin', pitchHTML('card', pitchAt));
+    if (pitchAt && place === 'float') $('#listView').insertAdjacentHTML('beforeend', pitchHTML('float', pitchAt));
+    $('#listView').classList.toggle('has-float', !!pitchAt && place === 'float');
     mountTargetIcon();
   }
 
   // Challenge pitch icon: a looping Rive animation (rive-target/). One canvas lives across
   // list renders so the loop doesn't restart every tick; the SVG shows until it loads.
-  const TARGET_ICON_PX = 36;
+  const TARGET_ICON_PX = 52; // the largest placement; smaller ones scale it down
   let targetIcon = null;
   if (window.rive && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
     const canvas = document.createElement('canvas');
@@ -212,7 +219,7 @@
     });
   }
   function mountTargetIcon() {
-    const slot = document.querySelector('.alarm-banner-icon');
+    const slot = document.querySelector('[data-pitch] .alarm-banner-icon');
     if (!targetIcon || !slot) return;
     slot.classList.add('has-rive');
     slot.appendChild(targetIcon);
@@ -223,10 +230,7 @@
     const card = e.target.closest('.alarm');
     if (!card) return;
     const a = alarms.find(x => x.id === card.dataset.id);
-    if (e.target.closest('.alarm-banner')) {
-      openChallengeFromList(a);
-      return;
-    }
+    if (e.target.closest('[data-pitch]')) return; // handled on #listView with the other placements
     if (e.target.closest('.switch')) {
       a.enabled = !a.enabled;
       a.snoozeUntil = null;
@@ -235,6 +239,11 @@
       return;
     }
     openEditor(a);
+  });
+  $('#listView').addEventListener('click', (e) => {
+    if (e.target.closest('[data-pitch-close]')) { lsSet(PITCH_KEY, 'hide'); renderList(); return; }
+    const b = e.target.closest('[data-pitch]');
+    if (b) openChallengeFromList(alarms.find(x => x.id === b.dataset.pitch));
   });
   $('#alarmList').addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && e.target.classList.contains('alarm')) e.target.click();
@@ -1200,6 +1209,8 @@
   const challengeEverUsed = () => lsGet(USED_KEY) === '1' || alarms.some(a => CH[a.challenge]);
   // The list's challenge banner shows until a challenge is set up once; the sidebar can force it 'show' or 'hide'
   const PITCH_KEY = 'alarm-pitch';
+  const PLACE_KEY = 'alarm-pitch-place', PLACES = ['footer', 'pill', 'hero', 'card', 'float'];
+  const pitchPlace = () => PLACES.includes(lsGet(PLACE_KEY)) ? lsGet(PLACE_KEY) : 'footer';
   const pitchShown = () => lsGet(PITCH_KEY) === 'show' || (lsGet(PITCH_KEY) !== 'hide' && !challengeEverUsed());
   let nudging = false, nudgeTimers = [];
   const later = (fn, ms) => nudgeTimers.push(setTimeout(fn, ms));
@@ -1567,6 +1578,12 @@
     },
     bannerShown: () => pitchShown(),
     setBanner(on) { lsSet(PITCH_KEY, on ? 'show' : 'hide'); resetScreens(); renderList(); },
+    bannerPlace: () => pitchPlace(),
+    setBannerPlace(p) {
+      lsSet(PLACE_KEY, p); lsSet(PITCH_KEY, 'show');
+      resetScreens(); renderList();
+      document.querySelector('[data-pitch]')?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    },
     resetAll() { try { localStorage.clear(); } catch (e) {} location.reload(); },
   };
 })();

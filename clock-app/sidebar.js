@@ -18,6 +18,13 @@
   };
 
   const ICON_ID = { perms: 'perm', banner: 'target' };
+  const PLACES = [
+    ['footer', 'Card footer', 'A strip under the first alarm'],
+    ['pill', 'Inline pill', 'Inside the card, where “Challenge set” goes'],
+    ['hero', 'In the hero', 'A row inside the “Rings in” card'],
+    ['card', 'Standalone card', 'Its own card above the alarms'],
+    ['float', 'Floating', 'Above the tab bar, can be closed'],
+  ];
   const item = (id, t, s) => `<button class="sb-item" data-tab="${id}">${P.icon(ICON_ID[id] || id)}<span><div class="t">${t}</div><div class="s">${s}</div></span></button>`;
   $('#sbNav').innerHTML =
     Object.entries(CHALLENGES).map(([id, c]) => item(id, c.title, c.sub)).join('') +
@@ -78,7 +85,9 @@
       const on = P.bannerShown();
       return `<div class="sbp-head"><div class="sbp-title">Challenge banner</div>
           <label class="sbp-toggle">${on ? 'Showing' : 'Hidden'}<button class="switch" role="switch" id="bannerToggle" aria-checked="${on}" aria-label="Show the challenge banner"></button></label></div>
-        <div class="sbp-desc">“Set a challenge to dismiss the alarm” sits under the first alarm until a challenge is set up once, then goes away for good. Turn it on here to see it again; setting up a challenge from it hides it again.</div>`;
+        <div class="sbp-desc">“Set a challenge to dismiss the alarm” shows until a challenge is set up once, then goes away for good. Turn it on here to see it again; setting up a challenge from it hides it again.</div>
+        <div class="sbp-sub">Placement</div>
+        <div class="sbp-links">${PLACES.map(([id, t, s], i) => `<button class="sbp-link" data-act="place:${id}" aria-current="${P.bannerPlace() === id}"><span class="n">${i + 1}</span><span class="tx"><div class="t">${t}</div><div class="s">${s}</div></span>${ARROW}</button>`).join('')}</div>`;
     },
   };
 
@@ -113,6 +122,7 @@
     const actions = {
       setup: () => P.setup(arg), test: () => P.test(arg), edit: () => P.edit(arg), ring: () => P.ring(arg),
       savecode: () => P.saveCode(), newalarm: () => P.newAlarm(), dlg: () => P.permDialog(arg),
+      place: () => { P.setBannerPlace(arg); refresh(); },
       playnudge: () => P.playNudge(), realnudge: () => P.realNudge(), resetnudge: () => { P.resetNudge(); refresh(); },
     };
     actions[act]();
@@ -123,7 +133,7 @@
   let lastKey = '';
   setInterval(() => {
     const key = tab === 'perms' ? String(P.permsOn()) : tab === 'hook' ? JSON.stringify(P.nudgeState())
-      : tab === 'banner' ? String(P.bannerShown()) : '';
+      : tab === 'banner' ? P.bannerShown() + P.bannerPlace() : '';
     if (key && key !== lastKey) refresh();
     lastKey = key;
   }, 1000);
