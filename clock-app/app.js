@@ -124,6 +124,7 @@
           <div class="lbl">${esc(a.label || 'Alarm')}</div>
           <div class="time">${t}<span>${ap}</span></div>
           <div class="sub">${repeatLabel(a.days)} · ${status}</div>
+          ${CH[a.challenge] ? `<div class="ch-set"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1" fill="currentColor"/></svg>Challenge set</div>` : ''}
         </div>
         <button class="switch" role="switch" aria-checked="${a.enabled}" aria-label="Turn ${esc(a.label || 'alarm')} ${a.enabled ? 'off' : 'on'}"></button>
       </div>`;
@@ -175,12 +176,13 @@
         </span>
         <svg class="alarm-banner-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
       </button>`;
-    list.innerHTML = sorted.map((a, i) => {
+    // Shown alone it sits on the first alarm; brought back from the sidebar, on the first without a challenge
+    const pitchAt = !pitchShown() ? null : lsGet(PITCH_KEY) === 'show' ? (sorted.find(a => !CH[a.challenge]) || sorted[0]) : sorted[0];
+    list.innerHTML = sorted.map((a) => {
       const { t, ap } = fmt(a.h, a.m);
       const at = a.enabled ? nextAt(a, now) : null;
       const status = a.enabled ? (at ? `in ${fmtIn(at - now)}` : 'On') : 'Off';
-      // Pitch challenges until one has been set up once, then never again
-      const pitch = i === 0 && !challengeEverUsed();
+      const pitch = a === pitchAt;
       const cls = `alarm ${a.enabled ? 'on' : ''}${pitch ? ' alarm-has-banner' : ''}`;
       if (pitch) {
         return `<article class="${cls}" data-id="${a.id}" tabindex="0">
@@ -456,6 +458,7 @@
     steps: svg(foot(4.2, 2, 'a-f1') + foot(13.4, 8.6, 'a-f2')),
     perm: svg('<path d="M12 3l7 3v5c0 4.4-3 8.3-7 9.5C8 19.3 5 15.4 5 11V6z"/><path d="m9 12 2 2 4-4"/>'),
     hook: svg('<path d="M12 3.5l1.9 5.1 5.1 1.9-5.1 1.9L12 17.5l-1.9-5.1L5 10.5l5.1-1.9z"/><path d="M18.5 15.5l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z"/>'),
+    target: svg('<circle cx="11" cy="13" r="7.5"/><circle cx="11" cy="13" r="3.5"/><path d="M11 13l8-8M16.5 4.5v3h3"/>'),
     shake: svg('<g class="a-phone"><rect x="8.5" y="4" width="7" height="16" rx="2"/><path d="M11 17h2"/></g><path class="a-wave" d="M4.5 9v6M19.5 9v6"/>'),
     scan: svg('<rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1" fill="currentColor"/><path class="a-scan" d="M2.5 12h19" stroke-width="1.6"/>'),
   };
@@ -728,6 +731,7 @@
     draft.challenge = setupType;
     draft.cc[setupType] = cfg;
     lsSet(USED_KEY, '1');
+    try { localStorage.removeItem(PITCH_KEY); } catch (e) {}
     closePanel(true);
     screen.classList.remove('choosing', 'setting');
     syncEditor();
@@ -1194,6 +1198,9 @@
   function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
   function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
   const challengeEverUsed = () => lsGet(USED_KEY) === '1' || alarms.some(a => CH[a.challenge]);
+  // The list's challenge banner shows until a challenge is set up once; the sidebar can force it 'show' or 'hide'
+  const PITCH_KEY = 'alarm-pitch';
+  const pitchShown = () => lsGet(PITCH_KEY) === 'show' || (lsGet(PITCH_KEY) !== 'hide' && !challengeEverUsed());
   let nudging = false, nudgeTimers = [];
   const later = (fn, ms) => nudgeTimers.push(setTimeout(fn, ms));
 
@@ -1554,10 +1561,12 @@
     },
     realNudge() { resetScreens(); openEditor(null); toast('Scroll down to the Wake-up challenge card'); },
     resetNudge() {
-      try { localStorage.removeItem(NUDGE_KEY); localStorage.removeItem(USED_KEY); } catch (e) {}
+      try { localStorage.removeItem(NUDGE_KEY); localStorage.removeItem(USED_KEY); localStorage.removeItem(PITCH_KEY); } catch (e) {}
       alarms.forEach(a => { a.challenge = 'none'; });
       persist(); renderList();
     },
+    bannerShown: () => pitchShown(),
+    setBanner(on) { lsSet(PITCH_KEY, on ? 'show' : 'hide'); resetScreens(); renderList(); },
     resetAll() { try { localStorage.clear(); } catch (e) {} location.reload(); },
   };
 })();

@@ -14,9 +14,10 @@
   const OTHER = {
     perms: { title: 'Permissions', sub: 'With and without access' },
     hook:  { title: 'Intro hook', sub: 'First-time card animation' },
+    banner: { title: 'Challenge banner', sub: 'The pitch on the alarm list' },
   };
 
-  const ICON_ID = { perms: 'perm' };
+  const ICON_ID = { perms: 'perm', banner: 'target' };
   const item = (id, t, s) => `<button class="sb-item" data-tab="${id}">${P.icon(ICON_ID[id] || id)}<span><div class="t">${t}</div><div class="s">${s}</div></span></button>`;
   $('#sbNav').innerHTML =
     Object.entries(CHALLENGES).map(([id, c]) => item(id, c.title, c.sub)).join('') +
@@ -73,6 +74,12 @@
         <button class="sbp-btn ghost" data-act="realnudge">Try it with the real rules</button>
         <button class="sbp-btn ghost" data-act="resetnudge">Reset rules (forget it was shown/used)</button>`;
     },
+    banner() {
+      const on = P.bannerShown();
+      return `<div class="sbp-head"><div class="sbp-title">Challenge banner</div>
+          <label class="sbp-toggle">${on ? 'Showing' : 'Hidden'}<button class="switch" role="switch" id="bannerToggle" aria-checked="${on}" aria-label="Show the challenge banner"></button></label></div>
+        <div class="sbp-desc">“Set a challenge to dismiss the alarm” sits under the first alarm until a challenge is set up once, then goes away for good. Turn it on here to see it again; setting up a challenge from it hides it again.</div>`;
+    },
   };
 
   let tab = null;
@@ -96,6 +103,10 @@
       P.setPerms(!P.permsOn());
       return refresh();
     }
+    if (e.target.closest('#bannerToggle')) {
+      P.setBanner(!P.bannerShown());
+      return refresh();
+    }
     const b = e.target.closest('[data-act]');
     if (!b) return;
     const [act, arg] = b.dataset.act.split(':');
@@ -111,7 +122,8 @@
   // Keep live states (permission toggle, hook rules) in sync with what happens on the phone
   let lastKey = '';
   setInterval(() => {
-    const key = tab === 'perms' ? String(P.permsOn()) : tab === 'hook' ? JSON.stringify(P.nudgeState()) : '';
+    const key = tab === 'perms' ? String(P.permsOn()) : tab === 'hook' ? JSON.stringify(P.nudgeState())
+      : tab === 'banner' ? String(P.bannerShown()) : '';
     if (key && key !== lastKey) refresh();
     lastKey = key;
   }, 1000);

@@ -202,6 +202,12 @@
   .alarm .time { font-size: 38px; font-weight: 600; line-height: 1.1; color: var(--faint); letter-spacing: -.5px; }
   .alarm .time span { font-size: 17px; margin-left: 6px; font-weight: 600; }
   .alarm .sub { font-size: 15px; color: var(--faint); margin-top: 4px; }
+  .alarm .ch-set {
+    display: inline-flex; align-items: center; gap: 6px; margin-top: 8px;
+    padding: 4px 11px 4px 8px; border-radius: 999px; background: #e3fbe8;
+    font-size: 13.5px; font-weight: 500; color: #1d1d24;
+  }
+  .alarm:not(.on) .ch-set { opacity: .6; }
   .alarm.on .lbl, .alarm.on .sub { color: var(--muted); }
   .alarm.on .time { color: var(--text); }
   .empty { text-align: center; color: var(--faint); font-size: 14px; padding: 18px 0; }
@@ -808,6 +814,7 @@
   .sb-item .s { font-size: 12px; color: var(--sb-muted); }
   .cic-perm { --c1: #b5ecec; --c2: #36b5b8; --ink: #053d3f; --glow: rgba(54,181,184,.6); }
   .cic-hook { --c1: #ffc9de; --c2: #ec5f95; --ink: #5c0a2b; --glow: rgba(236,95,149,.6); }
+  .cic-target { --c1: #e6d6fa; --c2: #9b74e0; --ink: #2e1260; --glow: rgba(155,116,224,.6); }
 
   .sb-panel { margin-top: 14px; background: var(--sb-card); border: 1px solid var(--sb-line); border-radius: 16px; padding: 16px; }
   .sb-panel:empty { display: none; }
