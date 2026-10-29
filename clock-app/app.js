@@ -132,31 +132,42 @@
           <span class="alarm-banner-icon" aria-hidden="true">
             <svg class="alarm-banner-glyph" viewBox="0 0 24 24" aria-hidden="true">
               <defs>
-                <linearGradient id="abf-cloth" x1="7.5" y1="5.5" x2="17.5" y2="11.5" gradientUnits="userSpaceOnUse">
-                  <stop offset="0" stop-color="#45c07a"/>
-                  <stop offset=".42" stop-color="#134e2e"/>
-                  <stop offset="1" stop-color="#062618"/>
+                <linearGradient id="abt-rim" x1="8" y1="4" x2="16" y2="18" gradientUnits="userSpaceOnUse">
+                  <stop offset="0" stop-color="#4a6fa5"/>
+                  <stop offset="1" stop-color="#1e3354"/>
                 </linearGradient>
-                <linearGradient id="abf-mast" x1="5.3" y1="5" x2="7.7" y2="17.5" gradientUnits="userSpaceOnUse">
-                  <stop offset="0" stop-color="#0a2818"/>
-                  <stop offset=".45" stop-color="#1f6b42"/>
-                  <stop offset="1" stop-color="#051910"/>
+                <linearGradient id="abt-pink" x1="9" y1="5" x2="15" y2="17" gradientUnits="userSpaceOnUse">
+                  <stop offset="0" stop-color="#ffb3c9"/>
+                  <stop offset="1" stop-color="#e8487a"/>
                 </linearGradient>
-                <linearGradient id="abf-shine" x1="8" y1="6" x2="14.5" y2="9.5" gradientUnits="userSpaceOnUse">
-                  <stop offset="0" stop-color="#aaf5cc" stop-opacity=".65"/>
-                  <stop offset=".55" stop-color="#5fd995" stop-opacity=".2"/>
-                  <stop offset="1" stop-color="#5fd995" stop-opacity="0"/>
+                <linearGradient id="abt-feather" x1="16.5" y1="5" x2="19" y2="8.5" gradientUnits="userSpaceOnUse">
+                  <stop offset="0" stop-color="#ffe0a8"/>
+                  <stop offset="1" stop-color="#f59e42"/>
                 </linearGradient>
-                <filter id="abf-drop" x="-25%" y="-25%" width="150%" height="150%">
-                  <feDropShadow dx="0" dy=".75" stdDeviation=".5" flood-color="#021408" flood-opacity=".55"/>
+                <radialGradient id="abt-shine" cx="38%" cy="32%" r="55%">
+                  <stop offset="0" stop-color="#fff" stop-opacity=".5"/>
+                  <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+                </radialGradient>
+                <filter id="abt-drop" x="-20%" y="-20%" width="140%" height="140%">
+                  <feDropShadow dx="0" dy=".65" stdDeviation=".5" flood-color="#2a1538" flood-opacity=".35"/>
                 </filter>
               </defs>
-              <g class="alarm-banner-flag" filter="url(#abf-drop)">
-                <rect class="alarm-banner-pole" x="5.45" y="5.15" width="2.2" height="12.35" rx=".45" fill="url(#abf-mast)"/>
-                <g class="alarm-banner-cloth-wrap">
-                  <path class="alarm-banner-cloth" d="M7.65 5.35L16.85 8.55L7.65 11.75Z" fill="url(#abf-cloth)"/>
-                  <path class="alarm-banner-cloth-shine" d="M7.85 5.85L14.15 8.35L8.25 9.55Z" fill="url(#abf-shine)"/>
+              <g class="alarm-banner-target" filter="url(#abt-drop)">
+                <circle cx="12" cy="11.5" r="9" fill="url(#abt-rim)"/>
+                <circle cx="12" cy="11.5" r="7.2" fill="url(#abt-pink)"/>
+                <circle cx="12" cy="11.5" r="7.2" fill="url(#abt-shine)"/>
+                <path d="M12 11.5L19.2 11.5A7.2 7.2 0 0 1 12 18.7Z" fill="#000" opacity=".11"/>
+                <circle cx="12" cy="11.5" r="5.7" fill="#fff"/>
+                <circle cx="12" cy="11.5" r="4.2" fill="#f56a96"/>
+                <circle cx="12" cy="11.5" r="2.75" fill="#fff"/>
+                <circle cx="12" cy="11.5" r="1.25" fill="#e93d6f"/>
+                <g class="alarm-banner-target-arrow">
+                  <path d="M12 11.5l5.35-5.35" stroke="#243d62" stroke-width="2.35" stroke-linecap="round"/>
+                  <path d="M16.85 7.35c.55-.15 1.05-.05 1.35.35l-1.2.55z" fill="url(#abt-feather)"/>
+                  <path d="M17.55 6.55c.35-.45.95-.55 1.35-.15l-.85 1.05z" fill="url(#abt-feather)"/>
                 </g>
+                <path d="M5.2 5l.35 1 1 .35-1 .35-.35 1-.35-1-1-.35 1-.35z" fill="#ff9fbe" opacity=".85"/>
+                <path d="M18.4 17.2l.3.85.85.3-.85.3-.3.85-.3-.85-.85-.3.85-.3z" fill="#ff9fbe" opacity=".75"/>
               </g>
             </svg>
           </span>
@@ -180,6 +191,28 @@
         ${alarmBody(a, t, ap, status)}
       </article>`;
     }).join('');
+    mountTargetIcon();
+  }
+
+  // Challenge pitch icon: a looping Rive animation (rive-target/). One canvas lives across
+  // list renders so the loop doesn't restart every tick; the SVG shows until it loads.
+  const TARGET_ICON_PX = 36;
+  let targetIcon = null;
+  if (window.rive && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const canvas = document.createElement('canvas');
+    canvas.className = 'alarm-banner-rive';
+    canvas.width = canvas.height = Math.round(TARGET_ICON_PX * (window.devicePixelRatio || 1));
+    new rive.Rive({
+      src: 'assets/target-hit.riv', canvas, autoplay: true, stateMachine: 'State Machine 1',
+      layout: new rive.Layout({ fit: rive.Fit.Contain }),
+      onLoad: () => { targetIcon = canvas; mountTargetIcon(); },
+    });
+  }
+  function mountTargetIcon() {
+    const slot = document.querySelector('.alarm-banner-icon');
+    if (!targetIcon || !slot) return;
+    slot.classList.add('has-rive');
+    slot.appendChild(targetIcon);
   }
   const esc = (s) => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
