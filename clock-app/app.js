@@ -119,17 +119,65 @@
       return;
     }
     const sorted = [...alarms].sort((x, y) => (x.h * 60 + x.m) - (y.h * 60 + y.m));
-    list.innerHTML = sorted.map(a => {
-      const { t, ap } = fmt(a.h, a.m);
-      const at = a.enabled ? nextAt(a, now) : null;
-      const status = a.enabled ? (at ? `in ${fmtIn(at - now)}` : 'On') : 'Off';
-      return `<article class="alarm ${a.enabled ? 'on' : ''}" data-id="${a.id}" tabindex="0">
+    const alarmBody = (a, t, ap, status) => `<div class="alarm-body">
         <div>
           <div class="lbl">${esc(a.label || 'Alarm')}</div>
           <div class="time">${t}<span>${ap}</span></div>
           <div class="sub">${repeatLabel(a.days)} · ${status}</div>
         </div>
         <button class="switch" role="switch" aria-checked="${a.enabled}" aria-label="Turn ${esc(a.label || 'alarm')} ${a.enabled ? 'off' : 'on'}"></button>
+      </div>`;
+    const alarmBanner = `<button type="button" class="alarm-banner" aria-label="Set a wake-up challenge">
+        <span class="alarm-banner-left">
+          <span class="alarm-banner-icon" aria-hidden="true">
+            <svg class="alarm-banner-glyph" viewBox="0 0 24 24" aria-hidden="true">
+              <defs>
+                <linearGradient id="abf-cloth" x1="7.5" y1="5.5" x2="17.5" y2="11.5" gradientUnits="userSpaceOnUse">
+                  <stop offset="0" stop-color="#45c07a"/>
+                  <stop offset=".42" stop-color="#134e2e"/>
+                  <stop offset="1" stop-color="#062618"/>
+                </linearGradient>
+                <linearGradient id="abf-mast" x1="5.3" y1="5" x2="7.7" y2="17.5" gradientUnits="userSpaceOnUse">
+                  <stop offset="0" stop-color="#0a2818"/>
+                  <stop offset=".45" stop-color="#1f6b42"/>
+                  <stop offset="1" stop-color="#051910"/>
+                </linearGradient>
+                <linearGradient id="abf-shine" x1="8" y1="6" x2="14.5" y2="9.5" gradientUnits="userSpaceOnUse">
+                  <stop offset="0" stop-color="#aaf5cc" stop-opacity=".65"/>
+                  <stop offset=".55" stop-color="#5fd995" stop-opacity=".2"/>
+                  <stop offset="1" stop-color="#5fd995" stop-opacity="0"/>
+                </linearGradient>
+                <filter id="abf-drop" x="-25%" y="-25%" width="150%" height="150%">
+                  <feDropShadow dx="0" dy=".75" stdDeviation=".5" flood-color="#021408" flood-opacity=".55"/>
+                </filter>
+              </defs>
+              <g class="alarm-banner-flag" filter="url(#abf-drop)">
+                <rect class="alarm-banner-pole" x="5.45" y="5.15" width="2.2" height="12.35" rx=".45" fill="url(#abf-mast)"/>
+                <g class="alarm-banner-cloth-wrap">
+                  <path class="alarm-banner-cloth" d="M7.65 5.35L16.85 8.55L7.65 11.75Z" fill="url(#abf-cloth)"/>
+                  <path class="alarm-banner-cloth-shine" d="M7.85 5.85L14.15 8.35L8.25 9.55Z" fill="url(#abf-shine)"/>
+                </g>
+              </g>
+            </svg>
+          </span>
+          <span class="alarm-banner-copy">Set a challenge to dismiss the alarm</span>
+        </span>
+        <svg class="alarm-banner-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+      </button>`;
+    list.innerHTML = sorted.map((a, i) => {
+      const { t, ap } = fmt(a.h, a.m);
+      const at = a.enabled ? nextAt(a, now) : null;
+      const status = a.enabled ? (at ? `in ${fmtIn(at - now)}` : 'On') : 'Off';
+      const pitch = i === 0 && a.challenge === 'none';
+      const cls = `alarm ${a.enabled ? 'on' : ''}${pitch ? ' alarm-has-banner' : ''}`;
+      if (pitch) {
+        return `<article class="${cls}" data-id="${a.id}" tabindex="0">
+          ${alarmBody(a, t, ap, status)}
+          ${alarmBanner}
+        </article>`;
+      }
+      return `<article class="${cls}" data-id="${a.id}" tabindex="0">
+        ${alarmBody(a, t, ap, status)}
       </article>`;
     }).join('');
   }
@@ -139,6 +187,10 @@
     const card = e.target.closest('.alarm');
     if (!card) return;
     const a = alarms.find(x => x.id === card.dataset.id);
+    if (e.target.closest('.alarm-banner')) {
+      openChallengeFromList(a);
+      return;
+    }
     if (e.target.closest('.switch')) {
       a.enabled = !a.enabled;
       a.snoozeUntil = null;
@@ -162,6 +214,8 @@
     $('#deleteBtn').hidden = !existing;
     $('#more').classList.remove('open');
     $('#moreHead').setAttribute('aria-expanded', 'false');
+    $('#volCard').classList.remove('open');
+    $('#volHead').setAttribute('aria-expanded', 'false');
     $('#editScroll').scrollTop = 0;
     screen.classList.add('editing');
     syncEditor(true);
@@ -266,6 +320,12 @@
   bindSwitch('#gradualSw', 'gradual');
   bindSwitch('#snoozeSw', 'snooze');
   bindSwitch('#vibrateSw', 'vibrate');
+
+  // Alarm volume (collapsed by default so wake-up challenge fits first fold)
+  $('#volHead').onclick = () => {
+    const open = $('#volCard').classList.toggle('open');
+    $('#volHead').setAttribute('aria-expanded', open);
+  };
 
   // More options
   $('#moreHead').onclick = () => {
@@ -540,13 +600,18 @@
     pickedChallenge = b.dataset.id;
     renderChallengeList();
   });
-  $('#challengeTile').onclick = () => {
+  function openChallengePicker() {
     endNudge();
     stopSound();
     pickedChallenge = draft.challenge || 'none';
     renderChallengeList();
     screen.classList.add('choosing');
-  };
+  }
+  function openChallengeFromList(alarm) {
+    openEditor(alarm);
+    openChallengePicker();
+  }
+  $('#challengeTile').onclick = () => openChallengePicker();
   $('#challengeBack').onclick = () => screen.classList.remove('choosing');
   $('#challengeContinue').onclick = () => {
     if (pickedChallenge !== 'none') return openSetup(pickedChallenge);

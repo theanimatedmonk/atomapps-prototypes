@@ -153,9 +153,55 @@
 
   .alarm {
     background: var(--card); border-radius: 22px; padding: 18px 22px 20px;
+    border: 1px solid var(--line);
     display: flex; align-items: center; justify-content: space-between; gap: 12px;
     cursor: pointer; transition: transform .1s;
   }
+  .alarm-has-banner {
+    flex-direction: column; align-items: stretch; padding: 0; overflow: hidden; gap: 0;
+  }
+  .alarm-body {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 18px 22px 18px; width: 100%;
+  }
+  .alarm-banner {
+    width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 13px 16px 14px 14px; text-align: left; cursor: pointer;
+    border-top: 1px solid rgba(0, 0, 0, .05);
+    background: #e5f9e9;
+    transition: filter .15s;
+  }
+  .alarm-banner:active { filter: brightness(.98); }
+  .alarm-banner-left { display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1; }
+  .alarm-banner-icon {
+    flex: none; width: 38px; height: 38px; border-radius: 12px;
+    display: grid; place-items: center;
+    background: linear-gradient(165deg, #9ee8b8 0%, #8ed9a7 55%, #7ecf9e 100%);
+    border: 1.5px solid #6bc48a;
+    box-shadow:
+      inset 2px 2px 4px rgba(255, 255, 255, .45),
+      inset -1px -2px 4px rgba(30, 100, 55, .15),
+      0 2px 5px rgba(20, 80, 45, .18);
+  }
+  .alarm-banner-glyph { width: 24px; height: 24px; overflow: visible; display: block; }
+  .alarm-banner-cloth-wrap {
+    transform-box: view-box;
+    transform-origin: 7.65px 8.55px;
+    animation: alarm-flag-wave 3s ease-in-out infinite;
+  }
+  @keyframes alarm-flag-wave {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(4deg); }
+    50% { transform: rotate(-2.5deg); }
+    75% { transform: rotate(3deg); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .alarm-banner-cloth-wrap { animation: none; }
+  }
+  .alarm-banner-copy { font-size: 14px; line-height: 1.35; font-weight: 500; color: #333; min-width: 0; }
+  .alarm-banner-chev { flex: none; color: #8a9099; opacity: .75; }
+  .alarm-has-banner:active { transform: none; }
+  .alarm-has-banner .alarm-body:active { transform: scale(.99); }
   .alarm:active { transform: scale(.99); }
   .alarm .lbl { font-size: 15px; color: var(--faint); margin-bottom: 2px; }
   .alarm .time { font-size: 38px; font-weight: 600; line-height: 1.1; color: var(--faint); letter-spacing: -.5px; }
@@ -259,6 +305,14 @@
   }
   .play:hover { background: #dcdaf8; }
   .divider { height: 1px; background: var(--line); margin: 0 0 16px; }
+
+  .vol-head { width: 100%; text-align: left; }
+  .vol-head-right { display: flex; align-items: center; gap: 6px; flex: none; }
+  .vol-body { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .28s ease; }
+  .vol-card.open .vol-body { grid-template-rows: 1fr; }
+  .vol-body > div { overflow: hidden; }
+  .vol-inner { padding-top: 14px; }
+  .vol-card.open .chev { transform: rotate(180deg); }
 
   .more-head { width: 100%; text-align: left; }
   .chev { transition: transform .25s; color: #3a3a45; flex: none; }

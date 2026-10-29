@@ -103,25 +103,28 @@
                 <div class="days" id="days"></div>
               </div>
 
-              <div class="card">
-                <div class="row"><span class="t">Alarm volume</span><span class="muted" id="volPct">70%</span></div>
-                <div class="vol">
-                  <svg class="spk" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 9h4l5-4v14l-5-4H4z"/></svg>
-                  <input type="range" id="volume" min="0" max="100" value="70" aria-label="Alarm volume">
-                  <button class="play" id="playBtn" aria-label="Play sound"></button>
-                </div>
-                <div class="divider"></div>
-                <div class="row">
-                  <div><div class="t">Increase volume gradually</div><div class="s">Starts soft, reaches full in 30 sec</div></div>
-                  <button class="switch" role="switch" id="gradualSw" aria-label="Increase volume gradually"></button>
-                </div>
-              </div>
-
-              <div class="card">
-                <div class="row">
-                  <div><div class="t">Snooze</div><div class="s" id="snoozeSub">5 minutes</div></div>
-                  <button class="switch" role="switch" id="snoozeSw" aria-label="Snooze"></button>
-                </div>
+              <div class="card vol-card" id="volCard">
+                <button class="row vol-head" id="volHead" aria-expanded="false">
+                  <span class="t">Alarm volume</span>
+                  <span class="vol-head-right">
+                    <span class="muted" id="volPct">70%</span>
+                    <svg class="chev" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+                  </span>
+                </button>
+                <div class="vol-body"><div>
+                  <div class="vol-inner">
+                    <div class="vol">
+                      <svg class="spk" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 9h4l5-4v14l-5-4H4z"/></svg>
+                      <input type="range" id="volume" min="0" max="100" value="70" aria-label="Alarm volume">
+                      <button class="play" id="playBtn" aria-label="Play sound"></button>
+                    </div>
+                    <div class="divider"></div>
+                    <div class="row">
+                      <div><div class="t">Increase volume gradually</div><div class="s">Starts soft, reaches full in 30 sec</div></div>
+                      <button class="switch" role="switch" id="gradualSw" aria-label="Increase volume gradually"></button>
+                    </div>
+                  </div>
+                </div></div>
               </div>
 
               <div class="card ch-card" id="challengeCard">
@@ -134,6 +137,13 @@
                   <svg class="chev-r" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
                 </button>
                 <button class="ch-remove-btn" id="challengeRemove" hidden>Remove Challenge</button>
+              </div>
+
+              <div class="card">
+                <div class="row">
+                  <div><div class="t">Snooze</div><div class="s" id="snoozeSub">5 minutes</div></div>
+                  <button class="switch" role="switch" id="snoozeSw" aria-label="Snooze"></button>
+                </div>
               </div>
 
               <div class="card more" id="more">
